@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --pink-deep:   #9d174d;
+            --pink-main:   #ec4899;
+            --pink-light:  #f9a8d4;
+            --pink-pale:   #fdf2f8;
+            --bg-dark:     #0f0509;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            background-color: var(--bg-dark);
+            min-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ── Animated background ── */
+        .bg-scene {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: drift 10s ease-in-out infinite alternate;
+        }
+        .orb-1 { width: 500px; height: 500px; top: -100px; left: -100px; background: rgba(236,72,153,0.28); animation-delay: 0s; }
+        .orb-2 { width: 400px; height: 400px; bottom: -80px; right: -80px; background: rgba(157,23,77,0.35); animation-delay: -4s; }
+        .orb-3 { width: 300px; height: 300px; top: 40%; left: 55%; background: rgba(249,168,212,0.15); animation-delay: -7s; }
+
+        @keyframes drift {
+            from { transform: translate(0,0) scale(1); }
+            to   { transform: translate(30px, 20px) scale(1.08); }
+        }
+
+        /* ── Split layout ── */
+        .login-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 1rem;
+            animation: slideUp 0.8s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        @keyframes slideUp {
+            from { opacity:0; transform: translateY(40px); }
+            to   { opacity:1; transform: translateY(0); }
+        }
+
+        .card-shell {
+            border-radius: 28px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(30px);
+            background: rgba(255,255,255,0.03);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        /* ── Left panel ── */
+        .panel-left {
+            background: linear-gradient(145deg, #9d174d 0%, #ec4899 60%, #f9a8d4 100%);
+            padding: 3rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+        .panel-left::before {
+            content: '';
+            position: absolute;
+            width: 320px; height: 320px;
+            border-radius: 50%;
+            border: 60px solid rgba(255,255,255,0.1);
+            top: -80px; right: -80px;
+        }
+        .panel-left::after {
+            content: '';
+            position: absolute;
+            width: 200px; height: 200px;
+            border-radius: 50%;
+            border: 40px solid rgba(255,255,255,0.08);
+            bottom: -50px; left: -50px;
+        }
+        .panel-brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            color: #fff;
+            letter-spacing: 0.02em;
+            position: relative;
+            z-index: 1;
+        }
+        .panel-tagline {
+            font-size: 2.8rem;
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.15;
+            position: relative;
+            z-index: 1;
+        }
+        .panel-tagline span {
+            display: block;
+            opacity: 0.65;
+            font-size: 1.1rem;
+            font-family: 'Jost', sans-serif;
+            font-weight: 300;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+        .panel-dots {
+            display: flex;
+            gap: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        .panel-dots i {
+            width: 8px; height: 8px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .panel-dots i:first-child { background: #fff; width: 24px; border-radius: 4px; }
+
+        /* ── Right panel (form) ── */
+        .panel-right {
+            background: rgba(15,5,9,0.85);
+            padding: 3rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .form-label-custom {
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.45);
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .form-control-custom {
+            background: rgba(255,255,255,0.05) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            border-radius: 12px !important;
+            color: #fff !important;
+            padding: 0.75rem 1rem 0.75rem 2.8rem !important;
+            font-size: 0.9rem;
+            font-family: 'Jost', sans-serif;
+            transition: all 0.3s ease;
+        }
+        .form-control-custom::placeholder { color: rgba(255,255,255,0.25) !important; }
+        .form-control-custom:focus {
+            background: rgba(236,72,153,0.07) !important;
+            border-color: rgba(236,72,153,0.6) !important;
+            box-shadow: 0 0 0 3px rgba(236,72,153,0.15) !important;
+            outline: none;
+        }
+
+        .input-icon-wrap {
+            position: relative;
+        }
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(249,168,212,0.6);
+            font-size: 1rem;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .btn-pink {
+            background: linear-gradient(135deg, #be185d, #ec4899);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Jost', sans-serif;
+            font-weight: 500;
+            font-size: 0.9rem;
+            letter-spacing: 0.08em;
+            padding: 0.8rem 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-pink::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #ec4899, #f9a8d4);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .btn-pink:hover::before { opacity: 1; }
+        .btn-pink:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(236,72,153,0.45); color: #fff; }
+        .btn-pink:active { transform: translateY(0); }
+        .btn-pink span { position: relative; z-index: 1; }
+
+        .divider-line {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255,255,255,0.2);
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .divider-line::before, .divider-line::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .social-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: rgba(255,255,255,0.6);
+            font-size: 1.2rem;
+            padding: 0.6rem;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .social-btn:hover {
+            background: rgba(236,72,153,0.15);
+            border-color: rgba(236,72,153,0.4);
+            color: var(--pink-light);
+            transform: translateY(-2px);
+        }
+
+        .link-pink { color: var(--pink-main); text-decoration: none; transition: color 0.2s; }
+        .link-pink:hover { color: var(--pink-light); }
+
+        .heading-form {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.2rem;
+            color: #fff;
+            font-weight: 600;
+            line-height: 1.2;
+            margin-bottom: 0.3rem;
+        }
+        .sub-heading {
+            color: rgba(255,255,255,0.35);
+            font-size: 0.85rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .panel-left { display: none; }
+            .panel-right { padding: 2.5rem 1.8rem; }
+            .card-shell { border-radius: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Animated background -->
+    <div class="bg-scene">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="login-wrapper">
+        <div class="card-shell">
+            <div class="row g-0">
+
+                <!-- ── Left decorative panel ── -->
+                <div class="col-md-5 panel-left">
+                    <div class="panel-brand">✦ Rosé</div>
+
+                    <div class="panel-tagline">
+                        <span>Your journey</span>
+                        Sign in &amp; Shine.
+                    </div>
+
+                    <div class="panel-dots">
+                        <i></i><i></i><i></i>
+                    </div>
+                </div>
+
+                <!-- ── Right form panel ── -->
+                <div class="col-md-7 panel-right">
+
+                    <p class="heading-form">Welcome back</p>
+                    <p class="sub-heading">Sign in to continue your experience.</p>
+
+                    <form action="register.html" method="post">
+
+                        <!-- Username -->
+                        <div class="mb-3">
+                            <label class="form-label-custom" for="USERNAME">Username</label>
+                            <div class="input-icon-wrap">
+                                <i class="bi bi-person input-icon"></i>
+                                <input
+                                    type="text"
+                                    id="USERNAME"
+                                    name="USERNAME"
+                                    class="form-control form-control-custom"
+                                    placeholder="Enter your username"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-1">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <label class="form-label-custom" for="PASSWORD">Password</label>
+                                <a href="#" class="link-pink" style="font-size:0.75rem;">Forgot password?</a>
+                            </div>
+                            <div class="input-icon-wrap">
+                                <i class="bi bi-lock input-icon"></i>
+                                <input
+                                    type="password"
+                                    id="PASSWORD"
+                                    name="PASSWORD"
+                                    class="form-control form-control-custom"
+                                    placeholder="••••••••"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- Remember me -->
+                        <div class="form-check mt-3 mb-4">
+                            <input class="form-check-input" type="checkbox" id="rememberMe" style="border-color:rgba(255,255,255,0.2);background:transparent;">
+                            <label class="form-check-label" for="rememberMe" style="color:rgba(255,255,255,0.4);font-size:0.82rem;">
+                                Keep me signed in
+                            </label>
+                        </div>
+
+                        <!-- Submit -->
+                        <button type="submit" class="btn btn-pink w-100 mb-4">
+                            <span>Sign In &nbsp;→</span>
+                        </button>
+
+                        <!-- Divider -->
+                        <div class="divider-line mb-4">or continue with</div>
+
+                        <!-- Social buttons -->
+                        <div class="d-flex gap-3 justify-content-center mb-4">
+                            <button type="button" class="social-btn flex-fill">
+                                <i class="bi bi-google"></i>
+                            </button>
+                            <button type="button" class="social-btn flex-fill">
+                                <i class="bi bi-github"></i>
+                            </button>
+                            <button type="button" class="social-btn flex-fill">
+                                <i class="bi bi-apple"></i>
+                            </button>
+                        </div>
+
+                        <p class="text-center mb-0" style="color:rgba(255,255,255,0.3);font-size:0.82rem;">
+                            Don't have an account?
+                            <a href="#" class="link-pink ms-1">Create one</a>
+                        </p>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
