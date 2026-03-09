@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My First Web Page</title>
+</head>
+
+<body id="query">
+
+    <h1 id="heading">Welcome to My Web Page</h1>
+    <p id="test">This is my first simple web page.</p>
+
+    <button id="button" type = "submit">Click Me</button>
+
+</body>
+
+<script >
+    let button = document.getElementById("button");
+    let paragraph = document.getElementById("test");
+    let body = document.getElementById("query");
+    let heading = document.getElementById("heading");
+
+    button.addEventListener("click",function(){
+    button.innerText = "Please wait....";
+    button.disabled = true;
+
+
+    heading.style.color = "white";
+
+
+    paragraph.style.color = "pink";
+
+    body.style.backgroundColor = "black";
+
+
+
+});
+</script>
+
+</html>
