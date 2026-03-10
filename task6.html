@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>MY TO-DO APP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            blush: {
+              50:  '#fff0f5',
+              100: '#ffe0ec',
+              200: '#ffb3cf',
+              300: '#ff80b0',
+              400: '#ff4d91',
+              500: '#f0256e',
+              600: '#c4154f',
+            }
+          },
+          fontFamily: {
+            display: ['Playfair Display', 'serif'],
+            body: ['DM Sans', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
+    .task-enter { animation: slideIn 0.3s ease forwards; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .checked-item { text-decoration: line-through; color: #f9a8c9; }
+  </style>
+</head>
+<body class="min-h-screen bg-blush-50 flex items-center justify-center p-6"
+      style="background: radial-gradient(ellipse at top left, #ffe0ec 0%, #fff0f5 60%, #ffffff 100%);">
+
+  <div class="w-full max-w-md">
+
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <p class="text-blush-400 text-sm font-body tracking-widest uppercase mb-1">Stay Organised</p>
+      <h1 class="font-display text-4xl text-blush-600">My To-Do List</h1>
+      <div class="mt-3 mx-auto w-16 h-1 rounded-full bg-gradient-to-r from-blush-300 to-blush-500"></div>
+    </div>
+
+    <!-- Card -->
+    <div class="bg-white rounded-3xl shadow-xl shadow-blush-200 p-6">
+
+      <!-- Input Row -->
+      <div class="flex gap-2 mb-6">
+        <input
+          id="task"
+          type="text"
+          placeholder="Add a new task…"
+          class="flex-1 border border-blush-200 rounded-2xl px-4 py-3 text-sm text-gray-700 placeholder-blush-300 focus:outline-none focus:ring-2 focus:ring-blush-300 focus:border-transparent transition"
+        />
+        <button
+          id="add"
+          class="bg-blush-500 hover:bg-blush-600 active:scale-95 text-white font-body font-medium text-sm px-5 py-3 rounded-2xl transition-all duration-150 shadow-md shadow-blush-300 whitespace-nowrap"
+        >
+          + Add
+        </button>
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty" class="text-center py-8 text-blush-300">
+        <div class="text-5xl mb-2">🌸</div>
+        <p class="text-sm font-body">Nothing to do yet — enjoy the day!</p>
+      </div>
+
+      <!-- Task List -->
+      <ul id="ulist" class="space-y-2"></ul>
+
+    </div>
+
+    <!-- Footer -->
+    <p class="text-center text-blush-300 text-xs mt-6 font-body">
+      ✦ Check off tasks as you go ✦
+    </p>
+  </div>
+
+  <script>
+    const input  = document.querySelector("#task");
+    const button = document.querySelector("#add");
+    const list   = document.querySelector("#ulist");
+    const empty  = document.querySelector("#empty");
+
+    function updateEmpty() {
+      empty.style.display = list.children.length === 0 ? "block" : "none";
+    }
+
+    function addTask() {
+      const task = input.value.trim();
+      if (!task) return;
+
+      const li = document.createElement("li");
+      li.className = "task-enter flex items-center gap-3 bg-blush-50 border border-blush-100 rounded-2xl px-4 py-3 group";
+
+      // Custom checkbox
+      const label = document.createElement("label");
+      label.className = "flex items-center gap-3 flex-1 cursor-pointer";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.className = "hidden";
+
+      const dot = document.createElement("span");
+      dot.className = "w-5 h-5 rounded-full border-2 border-blush-300 flex-shrink-0 flex items-center justify-center transition-all duration-200";
+
+      const text = document.createElement("span");
+      text.textContent = task;
+      text.className = "text-sm text-gray-700 font-body transition-colors duration-200";
+
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) {
+          dot.classList.replace("border-blush-300", "border-blush-500");
+          dot.classList.add("bg-blush-500");
+          dot.innerHTML = `<svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>`;
+          text.classList.add("checked-item");
+          li.classList.add("opacity-60");
+        } else {
+          dot.classList.replace("border-blush-500", "border-blush-300");
+          dot.classList.remove("bg-blush-500");
+          dot.innerHTML = "";
+          text.classList.remove("checked-item");
+          li.classList.remove("opacity-60");
+        }
+      });
+
+      // Delete button
+      const del = document.createElement("button");
+      del.innerHTML = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>`;
+      del.className = "text-blush-200 hover:text-blush-500 transition-colors opacity-0 group-hover:opacity-100";
+      del.addEventListener("click", () => { li.remove(); updateEmpty(); });
+
+      label.appendChild(checkbox);
+      label.appendChild(dot);
+      label.appendChild(text);
+      li.appendChild(label);
+      li.appendChild(del);
+      list.appendChild(li);
+
+      input.value = "";
+      updateEmpty();
+    }
+
+    button.addEventListener("click", addTask);
+    input.addEventListener("keydown", e => { if (e.key === "Enter") addTask(); });
+
+    updateEmpty();
+  </script>
+</body>
+</html>

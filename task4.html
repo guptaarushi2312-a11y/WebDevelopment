@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: white;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        form {
+            background-color: pink;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            border-color: red;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: pink;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #357abd;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Form Example</h2>
+
+    <form id="form">
+
+        <input type="email" id="email" placeholder="Enter email">
+
+        <br>
+        <br>
+
+        <input type="password" id="password" placeholder="Enter password">
+
+        <br>
+        <br>
+
+        <button type="submit">Submit</button>
+
+    </form>
+</body>
+
+<script>
+    const form = document.querySelector("#form")
+    const emailInput = document.querySelector("#email")
+    const passwordInput = document.querySelector("#password")
+
+    form.addEventListener("submit", function (e) {
+
+        e.preventDefault()
+
+        const email = emailInput.value
+        const password = passwordInput.value
+
+        const regex = /^(?=.*[A-Z]).{8,9}$/  //regex is all about patterns
+
+        if (regex.test(password)) {
+            console.log("Email:", email)
+            console.log("Password:", password)
+            console.log("Valid Password")
+        }
+        else {
+            console.log("Password must be 8 characters and contain at least one capital letter")
+        }
+
+    })
+</script>
+
+</html>
