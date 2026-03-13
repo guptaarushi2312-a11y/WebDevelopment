@@ -1,397 +1,338 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Glow & Go — Skin Care Recommender</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            blush:   { DEFAULT: '#f9a8c9', light: '#fde4ef', dark: '#e8699e', deep: '#c0437a' },
+            petal:   '#fff0f7',
+            cream:   '#fffaf9',
+            rosewood:'#8b2252',
+          },
+          fontFamily: {
+            display: ['Cormorant Garamond', 'serif'],
+            body:    ['DM Sans', 'sans-serif'],
+          },
+          keyframes: {
+            fadein:  { from: { opacity: 0, transform: 'translateY(14px)' }, to: { opacity: 1, transform: 'translateY(0)' } },
+            shimmer: { '0%,100%': { backgroundPosition: '0% 50%' }, '50%': { backgroundPosition: '100% 50%' } },
+            pulse2:  { '0%,100%': { transform: 'scale(1)' }, '50%': { transform: 'scale(1.04)' } },
+          },
+          animation: {
+            fadein:  'fadein .5s ease both',
+            shimmer: 'shimmer 4s ease infinite',
+            pulse2:  'pulse2 2s ease infinite',
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: #fffaf9; }
+    h1, h2, h3 { font-family: 'Cormorant Garamond', serif; }
 
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    .gradient-header {
+      background: linear-gradient(135deg, #f9a8c9 0%, #fde4ef 50%, #f9a8c9 100%);
+      background-size: 200% 200%;
+      animation: shimmer 4s ease infinite;
+    }
 
-    <style>
-        :root {
-            --pink-deep:   #9d174d;
-            --pink-main:   #ec4899;
-            --pink-light:  #f9a8d4;
-            --pink-pale:   #fdf2f8;
-            --bg-dark:     #0f0509;
-        }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { opacity: 1; }
 
-        * { box-sizing: border-box; }
+    .slider-thumb { accent-color: #e8699e; }
 
-        body {
-            font-family: 'Jost', sans-serif;
-            background-color: var(--bg-dark);
-            min-height: 100vh;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    .card-hover { transition: transform .2s, box-shadow .2s; }
+    .card-hover:hover { transform: translateY(-3px); box-shadow: 0 12px 32px #f9a8c960; }
 
-        /* ── Animated background ── */
-        .bg-scene {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            overflow: hidden;
-        }
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            animation: drift 10s ease-in-out infinite alternate;
-        }
-        .orb-1 { width: 500px; height: 500px; top: -100px; left: -100px; background: rgba(236,72,153,0.28); animation-delay: 0s; }
-        .orb-2 { width: 400px; height: 400px; bottom: -80px; right: -80px; background: rgba(157,23,77,0.35); animation-delay: -4s; }
-        .orb-3 { width: 300px; height: 300px; top: 40%; left: 55%; background: rgba(249,168,212,0.15); animation-delay: -7s; }
+    .compare-checkbox:checked + label { background: #fde4ef; border-color: #e8699e; }
 
-        @keyframes drift {
-            from { transform: translate(0,0) scale(1); }
-            to   { transform: translate(30px, 20px) scale(1.08); }
-        }
+    .fade-stagger > * { animation: fadein .4s ease both; }
+    .fade-stagger > *:nth-child(1) { animation-delay: .05s }
+    .fade-stagger > *:nth-child(2) { animation-delay: .1s }
+    .fade-stagger > *:nth-child(3) { animation-delay: .15s }
+    .fade-stagger > *:nth-child(4) { animation-delay: .2s }
+    .fade-stagger > *:nth-child(5) { animation-delay: .25s }
 
-        /* ── Split layout ── */
-        .login-wrapper {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 1rem;
-            animation: slideUp 0.8s cubic-bezier(0.16,1,0.3,1) both;
-        }
-        @keyframes slideUp {
-            from { opacity:0; transform: translateY(40px); }
-            to   { opacity:1; transform: translateY(0); }
-        }
-
-        .card-shell {
-            border-radius: 28px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.08);
-            backdrop-filter: blur(30px);
-            background: rgba(255,255,255,0.03);
-            box-shadow: 0 40px 100px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
-        }
-
-        /* ── Left panel ── */
-        .panel-left {
-            background: linear-gradient(145deg, #9d174d 0%, #ec4899 60%, #f9a8d4 100%);
-            padding: 3rem 2.5rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-            overflow: hidden;
-        }
-        .panel-left::before {
-            content: '';
-            position: absolute;
-            width: 320px; height: 320px;
-            border-radius: 50%;
-            border: 60px solid rgba(255,255,255,0.1);
-            top: -80px; right: -80px;
-        }
-        .panel-left::after {
-            content: '';
-            position: absolute;
-            width: 200px; height: 200px;
-            border-radius: 50%;
-            border: 40px solid rgba(255,255,255,0.08);
-            bottom: -50px; left: -50px;
-        }
-        .panel-brand {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 2rem;
-            color: #fff;
-            letter-spacing: 0.02em;
-            position: relative;
-            z-index: 1;
-        }
-        .panel-tagline {
-            font-size: 2.8rem;
-            font-family: 'Cormorant Garamond', serif;
-            font-weight: 700;
-            color: #fff;
-            line-height: 1.15;
-            position: relative;
-            z-index: 1;
-        }
-        .panel-tagline span {
-            display: block;
-            opacity: 0.65;
-            font-size: 1.1rem;
-            font-family: 'Jost', sans-serif;
-            font-weight: 300;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            margin-bottom: 0.5rem;
-        }
-        .panel-dots {
-            display: flex;
-            gap: 8px;
-            position: relative;
-            z-index: 1;
-        }
-        .panel-dots i {
-            width: 8px; height: 8px;
-            background: rgba(255,255,255,0.5);
-            border-radius: 50%;
-            display: inline-block;
-        }
-        .panel-dots i:first-child { background: #fff; width: 24px; border-radius: 4px; }
-
-        /* ── Right panel (form) ── */
-        .panel-right {
-            background: rgba(15,5,9,0.85);
-            padding: 3rem 2.5rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .form-label-custom {
-            font-size: 0.7rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.45);
-            font-weight: 500;
-            margin-bottom: 6px;
-        }
-
-        .form-control-custom {
-            background: rgba(255,255,255,0.05) !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
-            border-radius: 12px !important;
-            color: #fff !important;
-            padding: 0.75rem 1rem 0.75rem 2.8rem !important;
-            font-size: 0.9rem;
-            font-family: 'Jost', sans-serif;
-            transition: all 0.3s ease;
-        }
-        .form-control-custom::placeholder { color: rgba(255,255,255,0.25) !important; }
-        .form-control-custom:focus {
-            background: rgba(236,72,153,0.07) !important;
-            border-color: rgba(236,72,153,0.6) !important;
-            box-shadow: 0 0 0 3px rgba(236,72,153,0.15) !important;
-            outline: none;
-        }
-
-        .input-icon-wrap {
-            position: relative;
-        }
-        .input-icon {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: rgba(249,168,212,0.6);
-            font-size: 1rem;
-            pointer-events: none;
-            z-index: 5;
-        }
-
-        .btn-pink {
-            background: linear-gradient(135deg, #be185d, #ec4899);
-            border: none;
-            border-radius: 12px;
-            color: #fff;
-            font-family: 'Jost', sans-serif;
-            font-weight: 500;
-            font-size: 0.9rem;
-            letter-spacing: 0.08em;
-            padding: 0.8rem 1rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .btn-pink::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, #ec4899, #f9a8d4);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .btn-pink:hover::before { opacity: 1; }
-        .btn-pink:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(236,72,153,0.45); color: #fff; }
-        .btn-pink:active { transform: translateY(0); }
-        .btn-pink span { position: relative; z-index: 1; }
-
-        .divider-line {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: rgba(255,255,255,0.2);
-            font-size: 0.75rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-        }
-        .divider-line::before, .divider-line::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: rgba(255,255,255,0.1);
-        }
-
-        .social-btn {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            color: rgba(255,255,255,0.6);
-            font-size: 1.2rem;
-            padding: 0.6rem;
-            transition: all 0.25s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .social-btn:hover {
-            background: rgba(236,72,153,0.15);
-            border-color: rgba(236,72,153,0.4);
-            color: var(--pink-light);
-            transform: translateY(-2px);
-        }
-
-        .link-pink { color: var(--pink-main); text-decoration: none; transition: color 0.2s; }
-        .link-pink:hover { color: var(--pink-light); }
-
-        .heading-form {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 2.2rem;
-            color: #fff;
-            font-weight: 600;
-            line-height: 1.2;
-            margin-bottom: 0.3rem;
-        }
-        .sub-heading {
-            color: rgba(255,255,255,0.35);
-            font-size: 0.85rem;
-            margin-bottom: 2rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .panel-left { display: none; }
-            .panel-right { padding: 2.5rem 1.8rem; }
-            .card-shell { border-radius: 20px; }
-        }
-    </style>
+    .tag { display: inline-block; background: #fde4ef; color: #c0437a; border-radius: 9999px; padding: 2px 10px; font-size: 11px; font-weight: 500; letter-spacing: .04em; }
+  </style>
 </head>
-<body>
+<body class="min-h-screen bg-cream">
 
-    <!-- Animated background -->
-    <div class="bg-scene">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-    </div>
+  <!-- ── Header ── -->
+  <header class="gradient-header py-10 px-6 text-center shadow-sm">
+    <p class="text-blush-deep text-xs font-body tracking-[.25em] uppercase mb-1">Personalised for you</p>
+    <h1 class="text-5xl font-display font-light text-rosewood leading-tight">Glow &amp; Go</h1>
+    <p class="text-blush-dark text-sm font-body mt-2 tracking-wide">Your intelligent skin care advisor</p>
+  </header>
 
-    <div class="login-wrapper">
-        <div class="card-shell">
-            <div class="row g-0">
+  <main class="max-w-3xl mx-auto px-4 py-10 space-y-8">
 
-                <!-- ── Left decorative panel ── -->
-                <div class="col-md-5 panel-left">
-                    <div class="panel-brand">✦ Rosé</div>
+    <!-- ── Quiz Card ── -->
+    <section class="bg-white rounded-3xl shadow-sm border border-blush-light p-8 animate-fadein">
+      <h2 class="text-3xl font-display text-rosewood mb-1">Skin Quiz</h2>
+      <p class="text-sm text-pink-400 mb-6 font-body">Rate each on a scale of 1–5</p>
 
-                    <div class="panel-tagline">
-                        <span>Your journey</span>
-                        Sign in &amp; Shine.
-                    </div>
+      <div class="space-y-5" id="quizForm">
 
-                    <div class="panel-dots">
-                        <i></i><i></i><i></i>
-                    </div>
-                </div>
-
-                <!-- ── Right form panel ── -->
-                <div class="col-md-7 panel-right">
-
-                    <p class="heading-form">Welcome back</p>
-                    <p class="sub-heading">Sign in to continue your experience.</p>
-
-                    <form action="register.html" method="post">
-
-                        <!-- Username -->
-                        <div class="mb-3">
-                            <label class="form-label-custom" for="USERNAME">Username</label>
-                            <div class="input-icon-wrap">
-                                <i class="bi bi-person input-icon"></i>
-                                <input
-                                    type="text"
-                                    id="USERNAME"
-                                    name="USERNAME"
-                                    class="form-control form-control-custom"
-                                    placeholder="Enter your username"
-                                />
-                            </div>
-                        </div>
-
-                        <!-- Password -->
-                        <div class="mb-1">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <label class="form-label-custom" for="PASSWORD">Password</label>
-                                <a href="#" class="link-pink" style="font-size:0.75rem;">Forgot password?</a>
-                            </div>
-                            <div class="input-icon-wrap">
-                                <i class="bi bi-lock input-icon"></i>
-                                <input
-                                    type="password"
-                                    id="PASSWORD"
-                                    name="PASSWORD"
-                                    class="form-control form-control-custom"
-                                    placeholder="••••••••"
-                                />
-                            </div>
-                        </div>
-
-                        <!-- Remember me -->
-                        <div class="form-check mt-3 mb-4">
-                            <input class="form-check-input" type="checkbox" id="rememberMe" style="border-color:rgba(255,255,255,0.2);background:transparent;">
-                            <label class="form-check-label" for="rememberMe" style="color:rgba(255,255,255,0.4);font-size:0.82rem;">
-                                Keep me signed in
-                            </label>
-                        </div>
-
-                        <!-- Submit -->
-                        <button type="submit" class="btn btn-pink w-100 mb-4">
-                            <span>Sign In &nbsp;→</span>
-                        </button>
-
-                        <!-- Divider -->
-                        <div class="divider-line mb-4">or continue with</div>
-
-                        <!-- Social buttons -->
-                        <div class="d-flex gap-3 justify-content-center mb-4">
-                            <button type="button" class="social-btn flex-fill">
-                                <i class="bi bi-google"></i>
-                            </button>
-                            <button type="button" class="social-btn flex-fill">
-                                <i class="bi bi-github"></i>
-                            </button>
-                            <button type="button" class="social-btn flex-fill">
-                                <i class="bi bi-apple"></i>
-                            </button>
-                        </div>
-
-                        <p class="text-center mb-0" style="color:rgba(255,255,255,0.3);font-size:0.82rem;">
-                            Don't have an account?
-                            <a href="#" class="link-pink ms-1">Create one</a>
-                        </p>
-
-                    </form>
-                </div>
-
-            </div>
+        <!-- Q1 -->
+        <div>
+          <div class="flex justify-between mb-1">
+            <label class="text-sm font-medium text-pink-800">How oily does your skin feel during the day?</label>
+            <span id="v1" class="text-xs font-semibold text-blush-dark bg-blush-light px-2 py-0.5 rounded-full">3</span>
+          </div>
+          <input id="q1" type="range" min="1" max="5" value="3" class="w-full slider-thumb h-1.5 rounded-full bg-blush-light cursor-pointer"
+            oninput="document.getElementById('v1').textContent=this.value"/>
+          <div class="flex justify-between text-[10px] text-pink-300 mt-1"><span>Not at all</span><span>Very oily</span></div>
         </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Q2 -->
+        <div>
+          <div class="flex justify-between mb-1">
+            <label class="text-sm font-medium text-pink-800">How dry does your skin feel?</label>
+            <span id="v2" class="text-xs font-semibold text-blush-dark bg-blush-light px-2 py-0.5 rounded-full">3</span>
+          </div>
+          <input id="q2" type="range" min="1" max="5" value="3" class="w-full slider-thumb h-1.5 rounded-full bg-blush-light cursor-pointer"
+            oninput="document.getElementById('v2').textContent=this.value"/>
+          <div class="flex justify-between text-[10px] text-pink-300 mt-1"><span>Not at all</span><span>Very dry</span></div>
+        </div>
+
+        <!-- Q3 -->
+        <div>
+          <div class="flex justify-between mb-1">
+            <label class="text-sm font-medium text-pink-800">How often do you get acne?</label>
+            <span id="v3" class="text-xs font-semibold text-blush-dark bg-blush-light px-2 py-0.5 rounded-full">3</span>
+          </div>
+          <input id="q3" type="range" min="1" max="5" value="3" class="w-full slider-thumb h-1.5 rounded-full bg-blush-light cursor-pointer"
+            oninput="document.getElementById('v3').textContent=this.value"/>
+          <div class="flex justify-between text-[10px] text-pink-300 mt-1"><span>Rarely</span><span>Always</span></div>
+        </div>
+
+        <!-- Q4 -->
+        <div>
+          <div class="flex justify-between mb-1">
+            <label class="text-sm font-medium text-pink-800">How sensitive is your skin?</label>
+            <span id="v4" class="text-xs font-semibold text-blush-dark bg-blush-light px-2 py-0.5 rounded-full">3</span>
+          </div>
+          <input id="q4" type="range" min="1" max="5" value="3" class="w-full slider-thumb h-1.5 rounded-full bg-blush-light cursor-pointer"
+            oninput="document.getElementById('v4').textContent=this.value"/>
+          <div class="flex justify-between text-[10px] text-pink-300 mt-1"><span>Not sensitive</span><span>Very sensitive</span></div>
+        </div>
+
+      </div>
+
+      <!-- Extras -->
+      <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-pink-800 mb-1">Ingredient allergies <span class="text-pink-300">(comma separated)</span></label>
+          <input id="allergies" type="text" placeholder="e.g. fragrance, alcohol"
+            class="w-full rounded-xl border border-blush px-4 py-2 text-sm text-pink-900 placeholder-pink-200 focus:outline-none focus:ring-2 focus:ring-blush"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-pink-800 mb-1">Budget <span class="text-pink-300">(₹, leave blank for no limit)</span></label>
+          <input id="budget" type="number" placeholder="e.g. 1500"
+            class="w-full rounded-xl border border-blush px-4 py-2 text-sm text-pink-900 placeholder-pink-200 focus:outline-none focus:ring-2 focus:ring-blush"/>
+        </div>
+      </div>
+
+      <button onclick="getRecommendations()"
+        class="mt-7 w-full py-3 rounded-2xl bg-blush-dark hover:bg-blush-deep text-white font-body font-medium tracking-wide text-sm transition-all shadow-md hover:shadow-blush active:scale-95">
+        ✨ Analyse My Skin
+      </button>
+    </section>
+
+    <!-- ── Results ── -->
+    <section id="resultsSection" class="hidden">
+      <!-- Skin type badge -->
+      <div id="skinBadge" class="flex items-center gap-3 mb-5 animate-fadein">
+        <div class="h-px flex-1 bg-blush-light"></div>
+        <span class="text-sm font-body text-blush-dark font-medium bg-blush-light px-4 py-1 rounded-full border border-blush" id="skinLabel"></span>
+        <div class="h-px flex-1 bg-blush-light"></div>
+      </div>
+
+      <!-- Routine strip -->
+      <div class="bg-white border border-blush-light rounded-2xl px-6 py-4 mb-5 animate-fadein">
+        <p class="text-xs text-pink-400 uppercase tracking-widest mb-2 font-body">Suggested Routine</p>
+        <div class="flex flex-wrap gap-2">
+          <span class="tag">① Cleanser</span>
+          <span class="tag">② Toner</span>
+          <span class="tag">③ Serum</span>
+          <span class="tag">④ Moisturiser</span>
+          <span class="tag">⑤ Sunscreen</span>
+        </div>
+      </div>
+
+      <h2 class="text-3xl font-display text-rosewood mb-4">Recommended Products</h2>
+      <div id="results" class="grid grid-cols-1 sm:grid-cols-2 gap-4 fade-stagger"></div>
+
+      <!-- Budget tip -->
+      <div id="budgetTip" class="mt-5 bg-blush-light rounded-2xl px-5 py-3 border border-blush text-sm text-pink-800 font-body animate-fadein hidden">
+        <strong class="font-semibold">💸 Best value picks:</strong> <span id="budgetList"></span>
+      </div>
+
+      <!-- Compare -->
+      <div class="mt-8">
+        <button onclick="compareProducts()"
+          class="w-full py-2.5 rounded-2xl border-2 border-blush-dark text-blush-dark hover:bg-blush-light text-sm font-medium transition-all tracking-wide font-body">
+          🔍 Compare Selected Products
+        </button>
+        <div id="comparison" class="mt-5"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer class="text-center py-8 text-xs text-pink-300 font-body">
+    Made with 💗 for your skin · Glow &amp; Go
+  </footer>
+
+<script>
+let filteredProducts = [];
+
+async function getRecommendations() {
+  const btn = document.querySelector('button[onclick="getRecommendations()"]');
+  btn.textContent = '⏳ Analysing…';
+  btn.disabled = true;
+
+  const q1 = parseInt(document.getElementById('q1').value);
+  const q2 = parseInt(document.getElementById('q2').value);
+  const q3 = parseInt(document.getElementById('q3').value);
+  const q4 = parseInt(document.getElementById('q4').value);
+
+  let skinType = 'normal';
+  if (q1 >= 4) skinType = 'oily';
+  else if (q2 >= 4) skinType = 'dry';
+  else if (q4 >= 4) skinType = 'sensitive';
+
+  document.getElementById('skinLabel').textContent =
+    `Skin type detected: ${skinType.charAt(0).toUpperCase()+skinType.slice(1)}`;
+
+  const allergies = document.getElementById('allergies').value
+    .toLowerCase().split(',').map(a => a.trim()).filter(Boolean);
+  const budget = parseFloat(document.getElementById('budget').value) || Infinity;
+
+  try {
+    const res  = await fetch('https://dummyjson.com/products');
+    const data = await res.json();
+
+    filteredProducts = data.products.filter(p => {
+      const isBeauty = p.category && p.category.toLowerCase().includes('beauty');
+      const withinBudget = p.price <= budget;
+      const safe = !allergies.some(a => p.title.toLowerCase().includes(a));
+      return isBeauty && withinBudget && safe;
+    }).map(p => ({
+      ...p,
+      aiMatch: p.description && p.description.toLowerCase().includes(skinType)
+    }));
+
+    renderResults();
+  } catch(err) {
+    document.getElementById('results').innerHTML =
+      `<p class="col-span-2 text-pink-400 text-sm">Couldn't fetch products — please try again.</p>`;
+  }
+
+  document.getElementById('resultsSection').classList.remove('hidden');
+  btn.textContent = '✨ Analyse My Skin';
+  btn.disabled = false;
+}
+
+function renderResults() {
+  const resultsDiv = document.getElementById('results');
+  resultsDiv.innerHTML = '';
+
+  if (!filteredProducts.length) {
+    resultsDiv.innerHTML = '<p class="col-span-2 text-pink-300 text-sm">No products matched your profile.</p>';
+    return;
+  }
+
+  filteredProducts.forEach((p, idx) => {
+    const matchBadge = p.aiMatch
+      ? `<span class="tag bg-pink-100 text-blush-deep border border-blush">✦ Great match</span>`
+      : '';
+
+    const card = document.createElement('div');
+    card.className = 'bg-white border border-blush-light rounded-2xl p-4 card-hover relative';
+    card.innerHTML = `
+      <div class="flex gap-3 items-start">
+        <img src="${p.thumbnail || ''}" alt="${p.title}" class="w-16 h-16 rounded-xl object-cover border border-blush-light flex-shrink-0"/>
+        <div class="flex-1 min-w-0">
+          <p class="text-[11px] text-pink-300 uppercase tracking-widest mb-0.5">${p.category || 'Beauty'}</p>
+          <h3 class="text-sm font-semibold text-pink-900 leading-snug">${p.title}</h3>
+          <p class="text-blush-deep font-semibold text-sm mt-1">₹${p.price}</p>
+        </div>
+      </div>
+      <p class="text-xs text-pink-400 mt-2 line-clamp-2">${p.description || ''}</p>
+      <div class="flex items-center justify-between mt-3">
+        <div class="flex items-center gap-1 text-xs text-pink-500">
+          <span class="text-pink-400">⭐</span>
+          ${(p.rating || (Math.random()*2+3).toFixed(1))}/5
+        </div>
+        ${matchBadge}
+      </div>
+      <label class="mt-3 flex items-center gap-2 cursor-pointer select-none">
+        <input type="checkbox" class="compare-checkbox accent-pink-400" data-idx="${idx}"/>
+        <span class="text-xs text-pink-400">Add to compare</span>
+      </label>
+    `;
+    resultsDiv.appendChild(card);
+  });
+
+  // Budget tip
+  const top3 = [...filteredProducts].sort((a,b)=>b.price-a.price).slice(0,3);
+  if (top3.length) {
+    document.getElementById('budgetList').textContent = top3.map(p=>p.title).join(' · ');
+    document.getElementById('budgetTip').classList.remove('hidden');
+  }
+}
+
+function compareProducts() {
+  const compDiv = document.getElementById('comparison');
+  const checked = document.querySelectorAll('.compare-checkbox:checked');
+
+  if (checked.length < 2) {
+    compDiv.innerHTML = `<p class="text-xs text-pink-400 text-center mt-2">Select at least 2 products to compare.</p>`;
+    return;
+  }
+
+  const rows = Array.from(checked).map(c => filteredProducts[parseInt(c.dataset.idx)]);
+
+  let html = `
+    <h2 class="text-2xl font-display text-rosewood mb-3">Comparison</h2>
+    <div class="overflow-x-auto rounded-2xl border border-blush-light">
+    <table class="w-full text-sm text-left">
+      <thead class="bg-blush-light text-blush-deep">
+        <tr>
+          <th class="px-4 py-3 font-semibold">Product</th>
+          <th class="px-4 py-3 font-semibold">Price</th>
+          <th class="px-4 py-3 font-semibold">Rating</th>
+          <th class="px-4 py-3 font-semibold">Match</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-blush-light">
+  `;
+
+  rows.forEach(p => {
+    html += `
+      <tr class="hover:bg-petal transition-colors">
+        <td class="px-4 py-3 font-medium text-pink-900">${p.title}</td>
+        <td class="px-4 py-3 text-blush-deep font-semibold">₹${p.price}</td>
+        <td class="px-4 py-3 text-pink-500">⭐ ${p.rating || '—'}</td>
+        <td class="px-4 py-3">${p.aiMatch ? '<span class="tag">Great match</span>' : '<span class="text-pink-200 text-xs">—</span>'}</td>
+      </tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+  compDiv.innerHTML = html;
+}
+</script>
 </body>
 </html>
